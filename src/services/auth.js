@@ -1,11 +1,15 @@
+import {
+  createUserWithEmailAndPassword,
+  AuthErrorCodes,
+  signInWithEmailAndPassword
+} from "firebase/auth/react-native";
+
 import { auth } from "../config/firebase";
-import { createUserWithEmailAndPassword, AuthErrorCodes } from "firebase/auth/react-native";
-import { Alert } from "react-native";
 
 export async function cadastrarEmail(email, senha) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-    console.log(userCredential.user);
+    // console.log(userCredential.user);
     return "sucesso";
   }
   catch (error) {
@@ -31,4 +35,17 @@ function errosFirebase(error) {
       mensagem = "Erro ao cadastrar o e-mail";
   }
   return mensagem;
+}
+
+export async function logar(email, senha) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+    console.log(userCredential.user);
+    return "sucesso";
+  }
+  catch (error) {
+    console.log(error);
+    // const msgErro = errosFirebase(error);
+    return "erro";
+  }
 }

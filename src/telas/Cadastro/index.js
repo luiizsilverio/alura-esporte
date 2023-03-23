@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth/react-native';
 
+import estilos from './estilos';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
-import { auth } from '../../config/firebase';
-import estilos from './estilos';
 import { cadastrarEmail } from '../../services/auth';
+import { Alerta } from '../../componentes/Alerta';
 
 export default function Cadastro({ navigation }) {
   const [email, setEmail] = useState('');
@@ -28,8 +28,6 @@ export default function Cadastro({ navigation }) {
       return;
     }
     if (!!senha && senha !== confirmaSenha) {
-      console.log(senha)
-      console.log(confirmaSenha)
       setStatusErro('confirmaSenha');
       setMsgErro('Senhas não conferem');
       return;
@@ -38,17 +36,16 @@ export default function Cadastro({ navigation }) {
     const resultado = await cadastrarEmail(email, senha);
 
     if (resultado === 'sucesso') {
-      Alert.alert('Usuário cadastrado com sucesso!');
+      setStatusErro('firebase');
+      setMsgErro('Usuário cadastrado com sucesso!');
       setEmail('');
       setSenha('');
       setConfirmaSenha('');
     }
     else {
-      Alert.alert(resultado)
+      setStatusErro('firebase');
+      setMsgErro(resultado);
     }
-
-    setStatusErro('');
-    setMsgErro('');
   }
 
   return (
@@ -76,6 +73,12 @@ export default function Cadastro({ navigation }) {
         secureTextEntry
         error={statusErro === 'confirmaSenha'}
         messageError={msgErro}
+      />
+
+      <Alerta
+        mensagem={msgErro}
+        erro={statusErro === 'firebase'}
+        setErro={setStatusErro}
       />
 
       <Botao onPress={() => cadastra()}>
