@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+
 import { Alerta } from '../../componentes/Alerta';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { logar } from '../../services/auth';
+import { auth } from '../../config/firebase';
 import estilos from './estilos';
 
 export default function Login({ navigation }) {
@@ -11,6 +13,17 @@ export default function Login({ navigation }) {
   const [senha, setSenha] = useState('');
   const [statusErro, setStatusErro] = useState('');
   const [msgErro, setMsgErro] = useState('');
+
+  useEffect(() => {
+    // Verifica se já logou anteriormente
+    const estadoUsuario = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.replace('Principal');
+      }
+    })
+
+    return () => estadoUsuario();
+  }, [])
 
   async function loginEmail() {
     if (!email) {
@@ -32,7 +45,7 @@ export default function Login({ navigation }) {
       setMsgErro('Senha ou E-mail não conferem');
     }
     else {
-      navigation.navigate('Principal');
+      navigation.replace('Principal');
     }
 
   }
