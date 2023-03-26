@@ -1,18 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 
 import { Alerta } from '../../componentes/Alerta';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { logar } from '../../services/auth';
 import { auth } from '../../config/firebase';
+import loadingGif from '../../../assets/loading.gif';
 import estilos from './estilos';
 
 export default function Login({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
   const [statusErro, setStatusErro] = useState('');
   const [msgErro, setMsgErro] = useState('');
+  const [aguarde, setAguarde] = useState(true);
+
+  const [dados, setDados] = useState({
+    email: '',
+    senha: ''
+  })
+
+  const entradas = [
+    {
+      id: 1,
+      name: 'email',
+      label: 'E-mail',
+      messageError: 'Digite um e-mail válido',
+      secureTextEntry: false
+    },
+    {
+      id: 2,
+      name: 'senha',
+      label: 'Senha',
+      messageError: 'Digite uma senha válida',
+      secureTextEntry: true
+    }
+  ]
+
 
   useEffect(() => {
     // Verifica se já logou anteriormente
@@ -20,24 +43,25 @@ export default function Login({ navigation }) {
       if (user) {
         navigation.replace('Principal');
       }
+      setAguarde(false);
     })
 
     return () => estadoUsuario();
   }, [])
 
   async function loginEmail() {
-    if (!email) {
+    if (!dados.email) {
       setStatusErro('email');
       setMsgErro('E-mail não informado');
       return;
     }
-    if (!senha) {
+    if (!dados.senha) {
       setStatusErro('senha');
       setMsgErro('Senha não informada');
       return;
     }
 
-    const resultado = await logar(email, senha);
+    const resultado = await logar(dados.email, dados.senha);
     console.log(resultado)
 
     if (resultado === "erro") {
@@ -50,23 +74,38 @@ export default function Login({ navigation }) {
 
   }
 
+  const alteraDados = (chave, valor) => {
+    setDados({
+      ...dados,
+      [chave]: valor
+    })
+  }
+
+  if (aguarde) {
+    return (
+      <View style={estilos.containerAnimacao}>
+        <Image source={loadingGif}
+          style={estilos.imagem}
+        />
+      </View>
+    )
+  }
+
   return (
     <View style={estilos.container}>
-      <EntradaTexto
-        label="E-mail"
-        value={email}
-        onChangeText={texto => setEmail(texto)}
-        error={statusErro === 'email'}
-        messageError={msgErro}
-      />
-      <EntradaTexto
-        label="Senha"
-        value={senha}
-        onChangeText={texto => setSenha(texto)}
-        secureTextEntry
-        error={statusErro === 'senha'}
-        messageError={msgErro}
-      />
+      {
+        entradas.map((entrada) => (
+          <EntradaTexto
+            key={entrada.id}
+            // label={entrada.label}
+            // messageError={entrada.messageError}
+            // secureTextEntry={entrada.secureTextEntry}
+            {...entrada}
+            value={dados[entrada.name]}
+            onChangeText={valor => alteraDados(entrada.name, valor)}
+          />
+        ))
+      }
 
       <Alerta
         mensagem={msgErro}
