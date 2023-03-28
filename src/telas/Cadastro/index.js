@@ -8,6 +8,30 @@ import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { cadastrarEmail } from '../../services/auth';
 import { Alerta } from '../../componentes/Alerta';
 
+const entradas = [
+  {
+    id: 1,
+    name: 'email',
+    label: 'E-mail',
+    messageError: 'Digite um e-mail válido',
+    secureTextEntry: false
+  },
+  {
+    id: 2,
+    name: 'senha',
+    label: 'Senha',
+    messageError: 'Digite uma senha válida',
+    secureTextEntry: true
+  },
+  {
+    id: 3,
+    name: 'confirmaSenha',
+    label: 'Confirmar Senha',
+    messageError: 'As senhas não conferem',
+    secureTextEntry: true
+  }
+]
+
 export default function Cadastro({ navigation }) {
   const [statusErro, setStatusErro] = useState('');
   const [msgErro, setMsgErro] = useState('');
@@ -56,34 +80,24 @@ export default function Cadastro({ navigation }) {
 
   return (
     <View style={estilos.container}>
-      <EntradaTexto
-        label="E-mail"
-        value={dados.email}
-        onChangeText={valor => alteraDados('email', valor)}
-        error={statusErro === 'email'}
-        messageError={msgErro}
-      />
-      <EntradaTexto
-        label="Senha"
-        value={dados.senha}
-        onChangeText={valor => alteraDados('senha', valor)}
-        secureTextEntry
-        error={statusErro === 'senha'}
-        messageError={msgErro}
-      />
-
-      <EntradaTexto
-        label="Confirmar Senha"
-        value={dados.confirmaSenha}
-        onChangeText={valor => alteraDados('confirmaSenha', valor)}
-        secureTextEntry
-        error={statusErro === 'confirmaSenha'}
-        messageError={msgErro}
-      />
+      {
+        entradas.map((entrada) => (
+          <EntradaTexto
+            key={entrada.id}
+            // label={entrada.label}
+            // messageError={entrada.messageError}
+            // secureTextEntry={entrada.secureTextEntry}
+            {...entrada}
+            error={statusErro === entrada.name}
+            value={dados[entrada.name]}
+            onChangeText={valor => alteraDados(entrada.name, valor)}
+          />
+        ))
+      }
 
       <Alerta
         mensagem={msgErro}
-        erro={statusErro === 'firebase'}
+        erro={statusErro === 'firebird'}
         setErro={setStatusErro}
       />
 

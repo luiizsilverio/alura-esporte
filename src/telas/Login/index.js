@@ -9,6 +9,23 @@ import { auth } from '../../config/firebase';
 import loadingGif from '../../../assets/loading.gif';
 import estilos from './estilos';
 
+const entradas = [
+  {
+    id: 1,
+    name: 'email',
+    label: 'E-mail',
+    messageError: 'Digite um e-mail válido',
+    secureTextEntry: false
+  },
+  {
+    id: 2,
+    name: 'senha',
+    label: 'Senha',
+    messageError: 'Digite uma senha válida',
+    secureTextEntry: true
+  }
+]
+
 export default function Login({ navigation }) {
   const [statusErro, setStatusErro] = useState('');
   const [msgErro, setMsgErro] = useState('');
@@ -18,24 +35,6 @@ export default function Login({ navigation }) {
     email: '',
     senha: ''
   })
-
-  const entradas = [
-    {
-      id: 1,
-      name: 'email',
-      label: 'E-mail',
-      messageError: 'Digite um e-mail válido',
-      secureTextEntry: false
-    },
-    {
-      id: 2,
-      name: 'senha',
-      label: 'Senha',
-      messageError: 'Digite uma senha válida',
-      secureTextEntry: true
-    }
-  ]
-
 
   useEffect(() => {
     // Verifica se já logou anteriormente
@@ -66,7 +65,7 @@ export default function Login({ navigation }) {
 
     if (resultado === "erro") {
       setStatusErro('firebase');
-      setMsgErro('Senha ou E-mail não conferem');
+      setMsgErro('Senha ou E-mail incorretos');
     }
     else {
       navigation.replace('Principal');
@@ -101,6 +100,7 @@ export default function Login({ navigation }) {
             // messageError={entrada.messageError}
             // secureTextEntry={entrada.secureTextEntry}
             {...entrada}
+            error={statusErro === entrada.name}
             value={dados[entrada.name]}
             onChangeText={valor => alteraDados(entrada.name, valor)}
           />
