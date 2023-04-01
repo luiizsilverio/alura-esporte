@@ -1,12 +1,34 @@
-import { View } from "react-native"
-import { EntradaTexto } from "../../componentes/EntradaTexto";
-import Botao from "../../componentes/Botao";
-import estilos from "./estilos";
 import { useState } from "react";
+import { View } from "react-native"
 
-export default function DadosProduto() {
+import Botao from "../../componentes/Botao";
+import { EntradaTexto } from "../../componentes/EntradaTexto";
+import { salvarProduto } from "../../services/firestore";
+import { Alerta } from "../../componentes/Alerta";
+import estilos from "./estilos";
+
+export default function DadosProduto({ navigation }) {
   const [nome, setNome] = useState('');
   const [preco, setPreco] = useState('');
+  const [mensagem, setMensagem] = useState('');
+  const [mostrarMensagem, setMostrarMensagem] = useState(false);
+
+  async function salvar() {
+    if (nome === '' || preco === '') {
+      setMensagem('Favor preencher todos os campos');
+      setMostrarMensagem(true);
+      return;
+    }
+
+    const resultado = await salvarProduto({ nome, preco });
+    if (resultado === 'erro') {
+      setMensagem('Erro ao criar produto');
+      setMostrarMensagem(true);
+    }
+    else {
+      navigation.goBack();
+    }
+  }
 
   return (
     <View style={estilos.container}>
@@ -20,10 +42,15 @@ export default function DadosProduto() {
         value={preco}
         onChangeText={value => setPreco(value)}
       />
-      <Botao onPress={() => {}}>
+      <Botao onPress={() => salvar()}>
         SALVAR
       </Botao>
 
+      <Alerta
+        mensagem={mensagem}
+        erro={mostrarMensagem}
+        setErro={setMostrarMensagem}
+      />
     </View>
   )
 }
