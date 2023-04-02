@@ -1,5 +1,5 @@
 import { db } from "../config/firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 export async function salvarProduto(data) {
   try {
@@ -25,5 +25,29 @@ export async function lerProdutos() {
   catch (erro) {
     console.log(erro);
     return [];
+  }
+}
+
+export async function atualizarProduto(id, data) {
+  try {
+    const produtoRef = doc(db, "produtos", id);
+    await updateDoc(produtoRef, data);
+    return 'ok';
+  }
+  catch (erro) {
+    console.log(erro);
+    return 'erro';
+  }
+}
+
+export async function excluirProduto(id) {
+  try {
+    const produtoRef = doc(db, "produtos", id);
+    await deleteDoc(produtoRef);
+    return 'ok';
+  }
+  catch (erro) {
+    console.log(erro);
+    return 'erro';
   }
 }

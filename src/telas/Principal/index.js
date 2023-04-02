@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
 
 import estilos from './estilos';
@@ -46,16 +46,21 @@ export default function Principal({ navigation }) {
       >
         {
           produtos?.map((produto) => (
-            <Produto
+            <TouchableOpacity
               key={produto.id}
-              nome={produto.nome}
-              preco={produto.preco}
-            />
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate("Dados Produto", produto)}
+            >
+              <Produto
+                nome={produto.nome}
+                preco={produto.preco}
+              />
+            </TouchableOpacity>
           ))
         }
       </ScrollView>
 
-      <BotaoProduto onPress={() => navigation.navigate('DadosProduto')}/>
+      <BotaoProduto onPress={() => navigation.navigate('Dados Produto')} />
      </View>
   );
 }

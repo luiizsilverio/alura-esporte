@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { View } from "react-native"
+import { View, TouchableOpacity, Alert } from "react-native"
+import { useRoute } from "@react-navigation/native";
+import Icon from 'react-native-vector-icons/Feather';
 
 import Botao from "../../componentes/Botao";
 import { EntradaTexto } from "../../componentes/EntradaTexto";
-import { salvarProduto } from "../../services/firestore";
+import { salvarProduto, atualizarProduto, excluirProduto } from "../../services/firestore";
 import { Alerta } from "../../componentes/Alerta";
 import estilos from "./estilos";
 
-export default function DadosProduto({ navigation }) {
-  const [nome, setNome] = useState('');
-  const [preco, setPreco] = useState('');
+export default function DadosProduto({ navigation, route }) {
+  const [nome, setNome] = useState(route.params?.nome || '');
+  const [preco, setPreco] = useState(route.params?.preco.toString() || '');
   const [mensagem, setMensagem] = useState('');
   const [mostrarMensagem, setMostrarMensagem] = useState(false);
 
@@ -20,7 +22,15 @@ export default function DadosProduto({ navigation }) {
       return;
     }
 
-    const resultado = await salvarProduto({ nome, preco });
+    let resultado = '';
+
+    if (route.params) {
+      resultado = await atualizarProduto(route.params.id, { nome, preco });
+    }
+    else {
+      resultado = await salvarProduto({ nome, preco });
+    }
+
     if (resultado === 'erro') {
       setMensagem('Erro ao criar produto');
       setMostrarMensagem(true);
@@ -30,8 +40,39 @@ export default function DadosProduto({ navigation }) {
     }
   }
 
+  async function excluir() {
+    Alert.alert(
+      'Excluir produto',
+      'Confirma exclusão do produto?',
+      [
+        {
+          text: 'Não',
+          style: 'cancel'
+        },
+        {
+          text: 'Sim',
+          style: 'default',
+          onPress: () => {
+            excluirProduto(route.params?.id);
+            navigation.goBack();
+          }
+        }
+      ]
+    )
+  }
+
   return (
     <View style={estilos.container}>
+      {
+        route.params?.id && (
+          <TouchableOpacity
+            onPress={() => excluir()}
+          >
+            <Icon name="trash" size={20} color="#000" />
+          </TouchableOpacity>
+        )
+      }
+
       <EntradaTexto
         label="Nome do produto"
         value={nome}
