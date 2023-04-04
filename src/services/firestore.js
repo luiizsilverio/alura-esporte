@@ -1,5 +1,16 @@
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  doc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot
+} from "firebase/firestore";
+
 import { db } from "../config/firebase";
-import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 export async function salvarProduto(data) {
   try {
@@ -51,3 +62,22 @@ export async function excluirProduto(id) {
     return 'erro';
   }
 }
+
+export async function lerProdutosTempoReal(setProdutos) {
+  const ref = query(collection(db, "produtos"));
+
+  onSnapshot(ref, (querySnapshot) => {
+    const produtos = [];
+    querySnapshot.forEach((doc) => {
+      produtos.push({
+        id: doc.id,
+        ...doc.data()
+      })
+    })
+    console.log(Date.now());
+    setProdutos(produtos);
+  })
+}
+
+// onSnapshot funciona como o socket.on. Ela fica escutando as alterações feitas no BD
+// e retorna a lista atualizada de forma automática.

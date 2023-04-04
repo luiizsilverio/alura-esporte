@@ -7,7 +7,7 @@ import Cabecalho from '../../componentes/Cabecalho';
 import Produto from '../../componentes/Produtos';
 import { auth, db } from '../../config/firebase';
 import { BotaoProduto } from '../../componentes/BotaoProduto';
-import { lerProdutos } from '../../services/firestore';
+import { lerProdutos, lerProdutosTempoReal } from '../../services/firestore';
 
 export default function Principal({ navigation }) {
   const usuario = auth.currentUser;
@@ -27,7 +27,8 @@ export default function Principal({ navigation }) {
   }
 
   useEffect(() => {
-    carregarListaProdutos();
+    // carregarListaProdutos(); // nao precisa mais
+    lerProdutosTempoReal(setProdutos); // possui websocket que atualiza em tempo real
   }, []);
 
   return (
